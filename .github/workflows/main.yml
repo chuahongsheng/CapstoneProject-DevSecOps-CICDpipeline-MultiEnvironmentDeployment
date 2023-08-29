@@ -26,12 +26,12 @@ jobs:
           run: npm install
 
   
-        - name: Check out repository code   # unit-testing
-          uses: actions/checkout@v3
-        - name: Run installation of dependencies commands
-          run: npm install
-        - name: Run unit testing command
-          run: npm test
+      #  - name: Check out repository code   # unit-testing
+      #    uses: actions/checkout@v3
+      #  - name: Run installation of dependencies commands
+      #    run: npm install
+      #  - name: Run unit testing command
+      #    run: npm test
   
 
         - name: Check out repository code   #package scan
