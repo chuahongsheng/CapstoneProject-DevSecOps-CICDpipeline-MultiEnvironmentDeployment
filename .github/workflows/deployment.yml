@@ -40,8 +40,7 @@ jobs:
       - run: npm run build --if-present
       - run: npm test
 
-
-        uses: actions/checkout@master     #Web Staging
+      - name: "Deploy to AWS Staging WebApp"  
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
@@ -53,9 +52,8 @@ jobs:
           AWS_REGION: 'ap-southeast-1'  
           SOURCE_DIR: './.next'
 
-        
-      - uses: actions/checkout@master     #Web Prod
-      - uses: jakejarvis/s3-sync-action@master
+      - name: "Deploy to AWS Prod WebApp"  
+        uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
         if:  inputs.target-env == 'Production' 
