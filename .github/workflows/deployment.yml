@@ -40,8 +40,9 @@ jobs:
       - run: npm run build --if-present
       - run: npm test
 
-      - uses: actions/checkout@master     #Web Staging
-      - uses: jakejarvis/s3-sync-action@master
+      - name: Check out repository code
+        uses: actions/checkout@master     #Web Staging
+        uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
         if:  inputs.target-env == 'Staging' 
