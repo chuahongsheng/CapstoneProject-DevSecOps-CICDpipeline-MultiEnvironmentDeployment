@@ -2,8 +2,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "start",
+    "build": "next build && next export",
+    "start": "npx serve@latest out",
     "test": "jest",
     "test:ci": "jest --ci"
   },
