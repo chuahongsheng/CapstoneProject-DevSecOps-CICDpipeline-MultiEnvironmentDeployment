@@ -13,16 +13,13 @@ exports[`renders homepage unchanged 1`] = `
         <a
           href="https://nextjs.org"
         >
-          Next.js!
+          Hello World!
         </a>
       </h1>
       <p
         class="description"
       >
-        Get started by editing 
-        <code>
-          pages/index.js
-        </code>
+        This is a sample WebApp
       </p>
       <div
         class="grid"
