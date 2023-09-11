@@ -1,0 +1,63 @@
+name: CICD for Static Website Application
+run-name: ${{ github.actor }} is doing CICD for static website application
+
+on:
+  push:
+    branches: [ main, "*" ]
+
+  workflow_dispatch: 
+    inputs:
+      
+      environment:
+        description: 'Choose an enviroment to deploy'
+        type: environment
+        required: true
+        default: 'Staging'
+
+jobs:
+    development:
+        name: Development
+        runs-on: ubuntu-latest
+        steps:
+        - run: echo "The job is automatically triggered by a ${{ github.event_name }} event."
+        - name: Check out repository code  #install dependencies
+          uses: actions/checkout@v3
+        - name: Run installation of dependencies commands
+          run: npm install
+
+  
+        - name: Check out repository code   # unit-testing
+          uses: actions/checkout@v3
+        - name: Run installation of dependencies commands
+          run: npm install
+        - name: Run unit testing command
+          run: npm test
+  
+
+        - name: Check out repository code   #package scan
+          uses: actions/checkout@v3
+        - name: Run installation of dependencies commands
+          run: npm install
+        - name: Run audit
+          run: npm audit
+
+        - name: Zip artifact for deployment
+          run:          
+            zip release.zip ./* -r
+
+        - name: Upload artifact for deployment job
+          uses: actions/upload-artifact@v3
+          with:
+            name: web-app            
+            path: release.zip  
+
+    ReuseableMatrixJobForDeployment:
+      needs: development
+      strategy:
+        fail-fast: true
+        matrix:
+          target: [Staging, Production ]
+      uses: ./.github/workflows/deployment.yml
+      with:
+        target-env: ${{ matrix.target }}
+      secrets: inherit

@@ -1,0 +1,65 @@
+name: Reusable deployment workflow
+run-name: ${{ github.actor }} is doing deployment
+
+on:
+  workflow_call:
+    inputs:
+      target-env:
+        required: true
+        type: string
+
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.target-env }}
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.target-env }}
+
+
+    steps:
+      - run: echo "🎉 target evn ${{ inputs.target-env}}"
+      - run: echo "🎉 target evn inputs.target-env"
+      - run: echo "🍏 is Staging  ${{ inputs.target-env }} == 'Staging'"
+      - run: echo "🐧 is Prod  ${{ inputs.target-env }} == 'Production'"
+
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: web-app
+      
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16 
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
+
+      - name: "Deploy to AWS Staging WebApp"  
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        if:  inputs.target-env == 'Staging'
+        env: 
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_STAGING_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
+          AWS_REGION: 'ap-southeast-1'  
+          SOURCE_DIR: './out'
+
+      - name: "Deploy to AWS Prod WebApp"  
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        if:  inputs.target-env == 'Production' 
+        env: 
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_PRODUCTION_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
+          AWS_REGION: 'ap-southeast-1'  
+          SOURCE_DIR: './out'
